@@ -1,0 +1,14 @@
+{
+  "localeDir": "./src/ui/i18n/locales",
+  "scanDir": "./src/ui",
+  "locales": ["de", "en"],
+  "sourceLocale": "de",
+  "ignoreKeys": [
+    "notifications.ticket.*"
+  ],
+  "ignoreRawText": [
+    "MEGWARE"
+  ],
+  "textAttributes": [],
+  "warnAttributes": []
+}
