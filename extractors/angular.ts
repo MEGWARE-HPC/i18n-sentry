@@ -132,6 +132,9 @@ export function extractRawTextNodes(
 
     if (!text) continue
 
+    //@for,@if,@else...
+    if (/^@\w+/.test(text)) continue
+
     // Angular interpolations
     if (text.includes('{{')) continue
 
