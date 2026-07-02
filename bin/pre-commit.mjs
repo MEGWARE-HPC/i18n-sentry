@@ -61,7 +61,7 @@ function stepI18nScan(binDir) {
   if (result.success) {
     console.log(green(' ✓ no i18n errors found'))
   } else {
-    console.log(yellow('\n i18n issues found — please fix before merging:\n'))
+    console.log(yellow('\n i18n issues found — please  run <npx tsx i18n-sentry/bin/i18n-scan.ts> before merging:\n'))
     // Print the scan output indented
     const lines = result.output.split('\n')
     for (const line of lines) {
