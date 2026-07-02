@@ -30,7 +30,7 @@
     "lint",
     "translation"
   ],
-  "author": "",
+  "author": "PaterAnderson",
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^26.0.1",
