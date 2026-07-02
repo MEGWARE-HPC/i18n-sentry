@@ -1,14 +1,37 @@
 {
   "name": "i18n-sentry",
   "version": "0.1.0",
-  "type": "module",
   "description": "i18n quality checker for Vue, React, Angular and Svelte projects",
+  "type": "module",
   "bin": {
-    "i18n-sentry": "./bin/i18n-scan.ts"
+    "i18n-sentry": "./dist/bin/i18n-scan.js",
+    "i18n-sentry-setup": "./dist/bin/setup.js"
+  },
+  "exports": {
+    ".": "./dist/bin/i18n-scan.js"
   },
   "scripts": {
-    "scan": "tsx bin/i18n-scan.ts"
+    "build": "tsc",
+    "dev": "npx tsx bin/i18n-scan.ts",
+    "setup": "npx tsx bin/setup.ts"
   },
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "i18n",
+    "localization",
+    "l10n",
+    "vue",
+    "nuxt",
+    "react",
+    "angular",
+    "svelte",
+    "lint",
+    "translation"
+  ],
+  "author": "",
+  "license": "MIT",
   "devDependencies": {
     "@types/node": "^26.0.1",
     "tsx": "^4.0.0",

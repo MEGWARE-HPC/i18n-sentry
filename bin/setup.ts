@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-// i18n-sentry – setup.ts
 // Interactive setup script for new projects
 // Run: npx tsx i18n-sentry/bin/setup.ts
 
