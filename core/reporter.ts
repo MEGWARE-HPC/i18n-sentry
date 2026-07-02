@@ -1,13 +1,6 @@
 import type { Issue, FileIssue } from './config.js'
-
-// ── Colors ────────────────────────────────────────────────────────────────────
-
-export const red    = (s: string) => `\x1b[31m${s}\x1b[0m`
-export const yellow = (s: string) => `\x1b[33m${s}\x1b[0m`
-export const cyan   = (s: string) => `\x1b[36m${s}\x1b[0m`
-export const green  = (s: string) => `\x1b[32m${s}\x1b[0m`
-export const bold   = (s: string) => `\x1b[1m${s}\x1b[0m`
-export const dim    = (s: string) => `\x1b[2m${s}\x1b[0m`
+import { red, yellow, cyan, green, bold } from '../utils/colors.js'
+export { red, yellow, cyan, green, bold, dim } from '../utils/colors.js'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -58,15 +51,15 @@ export function printSimpleSection(
 // ── Summary ───────────────────────────────────────────────────────────────────
 
 export interface SummaryInput {
-  missingKeys:          FileIssue[]
-  hardcodedErrors:      FileIssue[]
-  hardcodedWarnings:    FileIssue[]
-  localeSyncIssues:     Issue[]
-  unusedKeys:           Issue[]
-  invalidKeys:          Issue[]
-  namespaceConflicts:   Issue[]
+  missingKeys:           FileIssue[]
+  hardcodedErrors:       FileIssue[]
+  hardcodedWarnings:     FileIssue[]
+  localeSyncIssues:      Issue[]
+  unusedKeys:            Issue[]
+  invalidKeys:           Issue[]
+  namespaceConflicts:    Issue[]
   placeholderMismatches: Issue[]
-  icuMismatches:        Issue[]
+  icuMismatches:         Issue[]
 }
 
 export function printSummary(s: SummaryInput): void {
@@ -85,7 +78,7 @@ export function printSummary(s: SummaryInput): void {
   const warningCount = s.hardcodedWarnings.length
 
   if (errorCount === 0 && warningCount === 0) {
-    console.log(green('✓  No i18n issues found!'))
+    console.log(green('✅  No i18n issues found!'))
   } else {
     const parts: string[] = []
     if (errorCount > 0)   parts.push(red(`${errorCount} error(s)`))
