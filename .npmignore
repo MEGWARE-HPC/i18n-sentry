@@ -1,0 +1,13 @@
+# Source files — only dist is published
+bin/
+core/
+extractors/
+utils/
+tsconfig.json
+*.ts
+!dist/
+
+# Dev files
+node_modules/
+.git/
+*.log
