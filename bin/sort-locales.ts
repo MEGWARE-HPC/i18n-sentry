@@ -1,9 +1,10 @@
 #!/usr/bin/env node
-// Sorts de.json and en.json alphabetically (nested, recursive)
+// Sorts configured locale JSON files alphabetically (nested, recursive)
 // Only sorts the configured locale files — never touches other JSON files
 
 import { readFileSync, writeFileSync, existsSync } from 'fs'
 import { resolve } from 'path'
+import { red, green, cyan, bold } from '../utils/colors.js'
 
 // ── Config ────────────────────────────────────────────────────────────────────
 
@@ -12,35 +13,28 @@ const CONFIG_FILE = 'i18n-sentry.config.json'
 function loadConfig() {
   const configPath = resolve(process.cwd(), CONFIG_FILE)
   if (!existsSync(configPath)) {
-    console.error(`Config file not found: ${CONFIG_FILE}`)
+    console.error(`${red('X')}  Config file not found: ${CONFIG_FILE}`)
     process.exit(1)
   }
   return JSON.parse(readFileSync(configPath, 'utf8'))
 }
 
 const config  = loadConfig()
-const LOCALES = config.locales ?? ['de', 'en']
-
-// ── ANSI Colors ───────────────────────────────────────────────────────────────
-
-const green  = (s) => `\x1b[32m${s}\x1b[0m`
-const cyan   = (s) => `\x1b[36m${s}\x1b[0m`
-const bold   = (s) => `\x1b[1m${s}\x1b[0m`
+const LOCALES: string[] = config.locales ?? ['de', 'en']
 
 // ── Sort ──────────────────────────────────────────────────────────────────────
 
-/** Recursively sort all keys of a JSON object alphabetically */
-function sortJson(obj) {
+function sortJson(obj: unknown): unknown {
   if (typeof obj !== 'object' || obj === null || Array.isArray(obj)) return obj
-  return Object.keys(obj)
+  return Object.keys(obj as Record<string, unknown>)
     .sort((a, b) => a.localeCompare(b))
-    .reduce((acc, key) => {
-      acc[key] = sortJson(obj[key])
+    .reduce((acc: Record<string, unknown>, key) => {
+      acc[key] = sortJson((obj as Record<string, unknown>)[key])
       return acc
     }, {})
 }
 
-function sortLocaleFile(localePath) {
+function sortLocaleFile(localePath: string): boolean {
   const raw    = readFileSync(localePath, 'utf8')
   const parsed = JSON.parse(raw)
   const sorted = sortJson(parsed)
@@ -65,7 +59,7 @@ function main() {
   for (const locale of LOCALES) {
     const path = resolve(process.cwd(), `${config.localeDir}/${locale}.json`)
     if (!existsSync(path)) {
-      console.error(`Locale file not found: ${path}`)
+      console.error(red(`X  Locale file not found: ${path}`))
       process.exit(1)
     }
     if (sortLocaleFile(path)) changed++
