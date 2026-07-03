@@ -311,7 +311,7 @@ async function main() {
 ${bold(green(' ✓ Setup complete!'))}
 
 Run your first scan:
-  ${cyan('npx tsx i18n-sentry/bin/i18n-scan.ts')}
+  ${cyan('npx i18n-sentry')}
 ${addScript ? `\nOr:\n  ${cyan('npm run lint:i18n')}` : ''}
 `)
 
