@@ -51,14 +51,14 @@ npm install i18n-sentry
 ### 2. Run interactive setup
 
 ```bash
-npx i18n-sentry-setup
+npx i18n-sentry setup
 ```
 
 The setup script will:
 - Auto-detect your framework (`vue`, `react`, `angular`, `svelte`) from `package.json`
 - Auto-detect your locale directory and scan directory
 - Auto-detect your locale languages from existing files
-- Ask whether to install `tsx` (required to run the TypeScript scanner)
+- Ask whether to install `tsx` (required to run the TypeScript-based CLI)
 - Ask whether to install the pre-commit hook
 - Ask whether to add a `lint:i18n` script to `package.json`
 - Write `i18n-sentry.config.json` to your project root
@@ -73,7 +73,22 @@ The setup script will:
 ```bash
 npx i18n-sentry
 ```
+or
 
+```bash
+npx i18n-sentry scan
+```
+
+### Additional commands
+```bash
+npx i18n-sentry sort            # sort locale files
+npx i18n-sentry install-hook    # install git hook
+```
+### Help & Version
+```bash
+npx i18n-sentry --help          # show CLI help
+npx i18n-sentry --version       # show version
+```
 ---
 
 ## Git hook (optional)

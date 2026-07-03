@@ -33,8 +33,8 @@ function main() {
 
   const hookContent = `#!/bin/sh
 # i18n-sentry pre-commit hook
-# Auto-installed by i18n-sentry/bin/install-hook.ts
-npx tsx "$(git rev-parse --show-toplevel)/i18n-sentry/bin/pre-commit.ts"
+# Auto-installed by \`npx i18n-sentry install-hook\`
+npx i18n-sentry pre-commit
 `
 
   writeFileSync(hookFile, hookContent, 'utf8')

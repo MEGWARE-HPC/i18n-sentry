@@ -4,16 +4,15 @@
   "description": "i18n quality checker for Vue, React, Angular and Svelte projects",
   "type": "module",
   "bin": {
-    "i18n-sentry": "./dist/bin/i18n-scan.js",
-    "i18n-sentry-setup": "./dist/bin/setup.js"
+    "i18n-sentry": "./dist/bin/cli.js"
   },
   "exports": {
     ".": "./dist/bin/i18n-scan.js"
   },
   "scripts": {
     "build": "tsc",
-    "dev": "npx tsx bin/i18n-scan.ts",
-    "setup": "npx tsx bin/setup.ts"
+    "dev": "npx tsx bin/cli.ts scan",
+    "setup": "npx tsx bin/cli.ts setup"
   },
   "files": [
     "dist"

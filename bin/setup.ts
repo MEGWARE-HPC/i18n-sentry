@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 // Interactive setup script for new projects
-// Run: npx tsx i18n-sentry/bin/setup.ts
-
+// Run: npx i18n-sentry setup
 import { existsSync, readFileSync, writeFileSync, readdirSync, statSync } from 'fs'
 import { resolve } from 'path'
 import { createInterface } from 'readline'
@@ -104,7 +103,6 @@ ${bold(cyan('└─────────────────────�
 Welcome! This script will configure i18n-sentry for your project.
 It will create ${cyan('i18n-sentry.config.json')} in your project root
 and optionally install a pre-commit hook.
-
 Project root: ${dim(process.cwd())}
 `)
 }
@@ -184,15 +182,6 @@ async function stepIgnoreText(): Promise<string[]> {
   return input.split(',').map(t => t.trim()).filter(Boolean)
 }
 
-async function stepInstallTsx(): Promise<boolean> {
-  console.log(`\n${bold('tsx')} is required to run i18n-sentry TypeScript files directly.`)
-  if (run('npx tsx --version', true)) {
-    console.log(`${green('✓')} tsx is already available`)
-    return false
-  }
-  return await askYesNo(`Install tsx as dev dependency?`)
-}
-
 async function stepInstallHook(): Promise<boolean> {
   return await askYesNo(`\nInstall pre-commit hook? ${dim('(warns about i18n issues, never blocks commits)')}`)
 }
@@ -217,17 +206,17 @@ async function stepPackageJsonLocation(): Promise<Choice | null> {
     choices.push({
       label: `Root  ${dim('./package.json')}`,
       value: '.',
-      script: 'npx tsx i18n-sentry/bin/i18n-scan.ts'
+      script: 'i18n-sentry scan'
     })
   }
 
   for (const d of subPkgs) {
-    const depth = d.split('/').length
-    const backToRoot = Array(depth).fill('..').join('/')
+    // npm puts every node_modules/.bin between here and the project root
+    // on PATH for package.json scripts, so no manual `cd` is required.
     choices.push({
       label: `${d}  ${dim('./' + d + '/package.json')}`,
       value: d,
-      script: `cd ${backToRoot} && npx tsx i18n-sentry/bin/i18n-scan.ts`
+      script: 'i18n-sentry scan'
     })
   }
 
@@ -277,7 +266,7 @@ async function main() {
       return
     }
   }
-
+  
   const framework      = await stepFramework()
   const localeDir      = await stepLocaleDir()
   const scanDir        = await stepScanDir()
@@ -285,39 +274,24 @@ async function main() {
   const sourceLocale   = await stepSourceLocale(locales)
   const ignoreKeys     = await stepIgnoreKeys()
   const ignoreText     = await stepIgnoreText()
-  const installTsx     = await stepInstallTsx()
   const installHook    = await stepInstallHook()
   const addScript      = await stepAddScript()
   const scriptLocation = addScript ? await stepPackageJsonLocation() : null
-
   console.log(`\n${bold('Applying configuration...')}\n`)
-
   writeConfig({ localeDir, scanDir, locales, sourceLocale, ignoreKeys, ignoreRawText: ignoreText, textAttributes: [], warnAttributes: [] })
-
-  if (installTsx) {
-    console.log(dim('\nInstalling tsx...'))
-    if (run('npm install --save-dev tsx')) console.log(`${green('✓')} tsx installed`)
-    else console.log(yellow('! tsx installation failed — run: npm i -D tsx'))
-  }
-
   if (installHook) {
-    const ok = run(`npx tsx "${resolve(process.cwd(), 'i18n-sentry/bin/install-hook.ts')}"`)
-    if (!ok) console.log(yellow('! Hook installation failed — run manually'))
+    const ok = run('npx i18n-sentry install-hook')
+    if (!ok) console.log(yellow('! Hook installation failed — run manually: npx i18n-sentry install-hook'))
   }
-
   if (addScript && scriptLocation) addPackageScript(scriptLocation)
-
   console.log(`
 ${bold(green(' ✓ Setup complete!'))}
-
 Run your first scan:
-  ${cyan('npx i18n-sentry')}
+  ${cyan('npx i18n-sentry scan')}
 ${addScript ? `\nOr:\n  ${cyan('npm run lint:i18n')}` : ''}
 `)
-
   rl.close()
 }
-
 main().catch(err => {
   console.error(red('Setup failed:'), err)
   rl.close()
