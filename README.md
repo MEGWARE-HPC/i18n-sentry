@@ -2,7 +2,7 @@
 
 A lightweight, framework-aware i18n quality checker for Vue, React, Angular and Svelte projects. Detects missing keys, hardcoded strings, invalid ICU syntax, and more.
 
-> **Status:** v0.1.0 – Vue/Nuxt and React (react-i18next, react-intl) are production-ready. Angular (ngx-translate) and Svelte are supported. Angular Localize (XLIFF) is planned for v0.2.0
+> **Status:** v0.1.1 – Vue/Nuxt and React (react-i18next, react-intl) are production-ready. Angular (ngx-translate) and Svelte are supported. Angular Localize (XLIFF) is planned for v0.2.0
 
 > **Limitation:** Keys must be statically analyzable via regex. Dynamically generated keys (e.g., `t(variable)`, `t(condition ? 'key1' : 'key2')`) are not supported yet. Use `ignoreKeys` to exclude patterns until AST-based extraction is implemented.
 
