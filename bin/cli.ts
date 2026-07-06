@@ -35,15 +35,17 @@ function printHelp() {
 i18n-sentry v${version}
 
 Usage:
-  npx i18n-sentry              Run scan (default)
-  npx i18n-sentry scan         Run scan
-  npx i18n-sentry setup        Interactive setup
-  npx i18n-sentry sort         Sort locale files
-  npx i18n-sentry install-hook Install git hook
+  i18n-sentry [command]
+
+Commands:
+  scan            Run scan (default)
+  setup           Interactive setup
+  sort            Sort locale files
+  install-hook    Install git hook
 
 Options:
-  --help, -h       Show help
-  --version, -v    Show version
+  -h, --help      Show help
+  -v, --version   Show version
 `)
 }
 

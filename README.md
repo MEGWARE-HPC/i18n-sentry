@@ -50,6 +50,8 @@ npm install i18n-sentry
 
 ### 2. Run interactive setup
 
+> **Note:** The examples below use `npx`, but the CLI also works with other package runners such as `bunx`, `pnpm dlx`, and `yarn dlx`.
+
 ```bash
 npx i18n-sentry setup
 ```
