@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from "fs";
+import { existsSync, readFileSync, readdirSync, statSync } from "fs";
 import { resolve } from "path";
 
 export interface SentryConfig {
@@ -33,6 +33,8 @@ export interface FileIssue {
 
 const CONFIG_FILE = "i18n-sentry.config.json";
 
+const SKIP_DIRS = new Set(["node_modules", ".git", "dist", ".nuxt", ".output"]);
+
 const EXAMPLE_CONFIG: SentryConfig = {
     localeDir: "./src/ui/i18n/locales",
     scanDir: "./src/ui",
@@ -44,13 +46,56 @@ const EXAMPLE_CONFIG: SentryConfig = {
     warnAttributes: [],
 };
 
-export function loadConfig(): SentryConfig {
-    const configPath = resolve(process.cwd(), CONFIG_FILE);
+// ── Config Discovery ──────────────────────────────────────────────────────────
 
-    if (!existsSync(configPath)) {
-        console.error(`\n  Config file not found: ${CONFIG_FILE}`);
-        console.error(`    Create a ${CONFIG_FILE} in your project root.\n`);
-        console.error(`    Example:`);
+function findConfigPath(): string | null {
+    // 1. Check root first
+    const rootPath = resolve(process.cwd(), CONFIG_FILE);
+    if (existsSync(rootPath)) return rootPath;
+
+    // 2. Search subdirectories automatically (up to 2 levels deep)
+    try {
+        for (const entry of readdirSync(process.cwd())) {
+            if (SKIP_DIRS.has(entry)) continue;
+            const entryPath = resolve(process.cwd(), entry);
+            try {
+                if (!statSync(entryPath).isDirectory()) continue;
+            } catch {
+                continue;
+            }
+
+            const configPath = resolve(entryPath, CONFIG_FILE);
+            if (existsSync(configPath)) return configPath;
+
+            // One level deeper
+            try {
+                for (const sub of readdirSync(entryPath)) {
+                    if (SKIP_DIRS.has(sub)) continue;
+                    const subPath = resolve(entryPath, sub);
+                    try {
+                        if (!statSync(subPath).isDirectory()) continue;
+                    } catch {
+                        continue;
+                    }
+
+                    const subConfig = resolve(subPath, CONFIG_FILE);
+                    if (existsSync(subConfig)) return subConfig;
+                }
+            } catch {}
+        }
+    } catch {}
+
+    return null;
+}
+
+export function loadConfig(): SentryConfig {
+    const configPath = findConfigPath();
+
+    if (!configPath) {
+        console.error(`\nX  Config file not found: ${CONFIG_FILE}`);
+        console.error(`    Run setup to create one:\n`);
+        console.error(`    npx i18n-sentry-setup\n`);
+        console.error(`    Or create it manually:\n`);
         console.error(JSON.stringify(EXAMPLE_CONFIG, null, 4));
         process.exit(1);
     }

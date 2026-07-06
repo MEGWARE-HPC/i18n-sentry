@@ -265,10 +265,12 @@ async function stepPackageJsonLocation(): Promise<Choice | null> {
 
 // ── Writers ───────────────────────────────────────────────────────────────────
 
-function writeConfig(cfg: object) {
-    const configPath = resolve(process.cwd(), "i18n-sentry.config.json");
+function writeConfig(cfg: object, basePath: string) {
+    const configPath = resolve(basePath, "i18n-sentry.config.json");
+
     writeFileSync(configPath, JSON.stringify(cfg, null, 2) + "\n", "utf8");
-    console.log(`\n${green("✓")} Created ${cyan("i18n-sentry.config.json")}`);
+
+    console.log(`\n${green("✓")} Created ${cyan(configPath)}`);
 }
 
 function addPackageScript(location: Choice) {
@@ -313,17 +315,21 @@ async function main() {
     const installHook = await stepInstallHook();
     const addScript = await stepAddScript();
     const scriptLocation = addScript ? await stepPackageJsonLocation() : null;
+    const basePath = scriptLocation?.value ?? process.cwd();
     console.log(`\n${bold("Applying configuration...")}\n`);
-    writeConfig({
-        localeDir,
-        scanDir,
-        locales,
-        sourceLocale,
-        ignoreKeys,
-        ignoreRawText: ignoreText,
-        textAttributes: [],
-        warnAttributes: [],
-    });
+    writeConfig(
+        {
+            localeDir,
+            scanDir,
+            locales,
+            sourceLocale,
+            ignoreKeys,
+            ignoreRawText: ignoreText,
+            textAttributes: [],
+            warnAttributes: [],
+        },
+        basePath
+    );
     if (installHook) {
         const ok = run("npx i18n-sentry install-hook");
         if (!ok) console.log(yellow("! Hook installation failed — run manually: npx i18n-sentry install-hook"));

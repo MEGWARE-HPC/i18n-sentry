@@ -5,19 +5,7 @@
 import { existsSync, readFileSync, writeFileSync } from "fs";
 import { resolve } from "path";
 import { bold, cyan, green, red } from "../utils/colors.js";
-
-// ── Config ────────────────────────────────────────────────────────────────────
-
-const CONFIG_FILE = "i18n-sentry.config.json";
-
-function loadConfig() {
-    const configPath = resolve(process.cwd(), CONFIG_FILE);
-    if (!existsSync(configPath)) {
-        console.error(`${red("X")}  Config file not found: ${CONFIG_FILE}`);
-        process.exit(1);
-    }
-    return JSON.parse(readFileSync(configPath, "utf8"));
-}
+import { loadConfig } from "../core/config.js";
 
 const config = loadConfig();
 const LOCALES: string[] = config.locales ?? ["de", "en"];
