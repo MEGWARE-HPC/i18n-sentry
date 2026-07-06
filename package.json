@@ -1,39 +1,39 @@
 {
-  "name": "i18n-sentry",
-  "version": "0.1.0",
-  "description": "i18n quality checker for Vue, React, Angular and Svelte projects",
-  "type": "module",
-  "bin": {
-    "i18n-sentry": "./dist/bin/cli.js"
-  },
-  "exports": {
-    ".": "./dist/bin/i18n-scan.js"
-  },
-  "scripts": {
-    "build": "tsc",
-    "dev": "npx tsx bin/cli.ts scan",
-    "setup": "npx tsx bin/cli.ts setup"
-  },
-  "files": [
-    "dist"
-  ],
-  "keywords": [
-    "i18n",
-    "localization",
-    "l10n",
-    "vue",
-    "nuxt",
-    "react",
-    "angular",
-    "svelte",
-    "lint",
-    "translation"
-  ],
-  "author": "PaterAnderson",
-  "license": "MIT",
-  "devDependencies": {
-    "@types/node": "^26.0.1",
-    "tsx": "^4.0.0",
-    "typescript": "^5.0.0"
-  }
+    "name": "i18n-sentry",
+    "version": "0.1.0",
+    "description": "i18n quality checker for Vue, React, Angular and Svelte projects",
+    "type": "module",
+    "bin": {
+        "i18n-sentry": "./dist/bin/cli.js"
+    },
+    "exports": {
+        ".": "./dist/bin/i18n-scan.js"
+    },
+    "scripts": {
+        "build": "tsc",
+        "dev": "npx tsx bin/cli.ts scan",
+        "setup": "npx tsx bin/cli.ts setup"
+    },
+    "files": [
+        "dist"
+    ],
+    "keywords": [
+        "i18n",
+        "localization",
+        "l10n",
+        "vue",
+        "nuxt",
+        "react",
+        "angular",
+        "svelte",
+        "lint",
+        "translation"
+    ],
+    "author": "PaterAnderson",
+    "license": "MIT",
+    "devDependencies": {
+        "@types/node": "^26.0.1",
+        "tsx": "^4.0.0",
+        "typescript": "^5.0.0"
+    }
 }
