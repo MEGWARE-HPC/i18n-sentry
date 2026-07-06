@@ -2,11 +2,9 @@
 
 A lightweight, framework-aware i18n quality checker for Vue, React, Angular and Svelte projects. Detects missing keys, hardcoded strings, invalid ICU syntax, and more.
 
-> **Status:** v0.1.1 – Vue/Nuxt and React (react-i18next, react-intl) are production-ready. Angular (ngx-translate) and Svelte are supported. Angular Localize (XLIFF) is planned for v0.2.0
 
-> **Limitation:** Keys must be statically analyzable via regex. Dynamically generated keys (e.g., `t(variable)`, `t(condition ? 'key1' : 'key2')`) are not supported yet. Use `ignoreKeys` to exclude patterns until AST-based extraction is implemented.
-
----
+<p align="center"><img width="930" height="1057" alt="showcase" src="https://github.com/user-attachments/assets/4fb2d60c-3748-47e2-bd55-608bf1df8577" />
+</p>
 
 ## What it checks
 
@@ -24,6 +22,8 @@ A lightweight, framework-aware i18n quality checker for Vue, React, Angular and 
 | Error | Hardcoded text in visible props (`placeholder`, `noDataText`, `alt`, etc.) |
 | Warning | Hardcoded accessibility text (`aria-label`, `title`, etc.) |
 
+> **Status:** v0.1.0 – Vue/Nuxt and React (react-i18next, react-intl) are production-ready. Angular (ngx-translate) and Svelte are supported. Angular Localize (XLIFF) is planned for v0.2.0
+
 ---
 
 ## Framework support
@@ -38,6 +38,7 @@ A lightweight, framework-aware i18n quality checker for Vue, React, Angular and 
 | Svelte (typesafe-i18n) | `$LL.key()` | Template scanning | Supported |
 | Angular Localize (XLIFF) | `i18n="@@key"` | XLIFF parsing | Planned v0.2 |
 
+> **Limitation:** Keys must be statically analyzable via regex. Dynamically generated keys (e.g., `t(variable)`, `t(condition ? 'key1' : 'key2')`) are not supported yet. Use `ignoreKeys` to exclude patterns until AST-based extraction is implemented.
 ---
 
 ## Setup
@@ -164,7 +165,7 @@ locales/
 
 ## Feedback & Contributing
 
-This project is newly released and actively being improved. We welcome your feedback, bug reports, and contributions!
+This project was developed by [MEGWARE Computer Vertrieb und Service GmbH](https://www.megware.com/) and actively being improved. We welcome your feedback, bug reports, and contributions!
 
 - Found a bug? [Open an issue](https://github.com/your-org/i18n-sentry/issues)
 - Have a feature request? [Start a discussion](https://github.com/your-org/i18n-sentry/discussions)
