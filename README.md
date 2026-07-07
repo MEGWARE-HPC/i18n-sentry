@@ -64,7 +64,7 @@ The setup script will:
 - Ask whether to install `tsx` (required to run the TypeScript-based CLI)
 - Ask whether to install the pre-commit hook
 - Ask whether to add a `lint:i18n` script to `package.json`
-- Write `i18n-sentry.config.json` to your project root
+- Write `i18n-sentry.config.json` to your project root or to the path of your package.json
 
 
 ---
@@ -167,8 +167,8 @@ locales/
 
 This project was developed by [MEGWARE Computer Vertrieb und Service GmbH](https://www.megware.com/) and actively being improved. We welcome your feedback, bug reports, and contributions!
 
-- Found a bug? [Open an issue](https://github.com/your-org/i18n-sentry/issues)
-- Have a feature request? [Start a discussion](https://github.com/your-org/i18n-sentry/discussions)
+- Found a bug? [Open an issue](https://github.com/MEGWARE-HPC/i18n-sentry/issues)
+- Have a feature request? [Start a discussion](https://github.com/MEGWARE-HPC/i18n-sentry/discussions)
 - Want to contribute? Pull requests are welcome!
 
 Your input helps make i18n-sentry better for the community.
