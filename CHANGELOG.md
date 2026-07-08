@@ -1,6 +1,14 @@
 # Changelog
 
-## [0.1.0] - 2026-07-03
+## [0.1.3] - 2026-07-08
+
+### Fixed
+
+- Improved Windows compatibility
+- Improved i18n source path detection
+- Improved Angular control flow syntax detection (`@if`, `@else`, `@for`)
+
+## [0.1.2] - 2026-07-03
 
 ### Added
 
