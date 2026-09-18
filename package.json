@@ -33,7 +33,10 @@
     "license": "MIT",
     "devDependencies": {
         "@types/node": "^26.0.1",
-        "tsx": "^4.0.0",
-        "typescript": "^5.0.0"
+        "tsx": "^4.0.0"
+    },
+    "dependencies": {
+        "@vue/compiler-sfc": "^3.5.43",
+        "typescript": "^5.9.3"
     }
 }

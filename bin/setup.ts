@@ -6,11 +6,11 @@ import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from "
 import { resolve } from "path";
 import { createInterface } from "readline";
 import { bold, cyan, dim, green, red, yellow } from "../utils/colors.js";
- 
+
 // ── Readline ──────────────────────────────────────────────────────────────────
- 
+
 const rl = createInterface({ input: process.stdin, output: process.stdout });
- 
+
 function ask(question: string, defaultValue?: string): Promise<string> {
     return new Promise((res) => {
         const hint = defaultValue ? dim(` (${defaultValue})`) : "";
@@ -19,7 +19,7 @@ function ask(question: string, defaultValue?: string): Promise<string> {
         });
     });
 }
- 
+
 function askYesNo(question: string, defaultYes = true): Promise<boolean> {
     return new Promise((res) => {
         const hint = defaultYes ? "[Y/n]" : "[y/N]";
@@ -30,14 +30,14 @@ function askYesNo(question: string, defaultYes = true): Promise<boolean> {
         });
     });
 }
- 
+
 interface Choice {
     label: string;
     hint?: string;
     value: string;
     script?: string;
 }
- 
+
 function askChoice(question: string, choices: Choice[]): Promise<Choice> {
     return new Promise((res) => {
         console.log(`\n${question}`);
@@ -48,9 +48,9 @@ function askChoice(question: string, choices: Choice[]): Promise<Choice> {
         });
     });
 }
- 
+
 // ── Helpers ───────────────────────────────────────────────────────────────────
- 
+
 function run(cmd: string, silent = false): boolean {
     try {
         execSync(cmd, { stdio: silent ? "pipe" : "inherit" });
@@ -59,7 +59,7 @@ function run(cmd: string, silent = false): boolean {
         return false;
     }
 }
- 
+
 function detectFramework(): string | null {
     const candidates = [
         "package.json",
@@ -85,12 +85,12 @@ function detectFramework(): string | null {
     }
     return null;
 }
- 
+
 function findLocaleDirs(dir: string, depth = 0): string[] {
     if (depth > 5) return [];
- 
+
     const results: string[] = [];
- 
+
     const ignored = new Set([
         "node_modules",
         "dist",
@@ -101,81 +101,81 @@ function findLocaleDirs(dir: string, depth = 0): string[] {
         ".nuxt",
         "coverage",
     ]);
- 
+
     try {
         for (const entry of readdirSync(dir)) {
             if (ignored.has(entry.toLowerCase())) continue;
- 
+
             const fullPath = resolve(dir, entry);
- 
+
             let stat;
             try {
                 stat = statSync(fullPath);
             } catch {
                 continue;
             }
- 
+
             if (!stat.isDirectory()) continue;
- 
+
             const lower = entry.toLowerCase();
- 
+
             if (lower === "i18n" || lower === "locales") {
                 results.push(fullPath);
             }
- 
+
             results.push(...findLocaleDirs(fullPath, depth + 1));
         }
     } catch {}
- 
+
     return results;
 }
- 
+
 function detectLocaleDir(): string | null {
     const found = findLocaleDirs(process.cwd());
- 
+
     for (const dir of found) {
         try {
             const files = readdirSync(dir);
- 
+
             // Only accept folders containing locale json files
             const hasJson = files.some((file) => file.endsWith(".json"));
- 
+
             if (hasJson) {
                 const relative = dir
                     .replace(process.cwd(), "")
                     .replaceAll("\\", "/")
                     .replace(/^\/+/, "");
- 
+
                 return `./${relative}`;
             }
         } catch {}
     }
- 
+
     return null;
 }
- 
+
 function detectScanDir(): string {
     for (const c of ["./src/ui", "./src/app", "./src"]) {
         if (existsSync(resolve(process.cwd(), c))) return c;
     }
     return "./src";
 }
- 
+
 // ── Steps ─────────────────────────────────────────────────────────────────────
- 
+
 async function stepWelcome() {
     console.log(`
 ${bold(cyan("┌─────────────────────────────────────┐"))}
 ${bold(cyan("│        i18n-sentry  setup           │"))}
 ${bold(cyan("└─────────────────────────────────────┘"))}
- 
+
 Welcome! This script will configure i18n-sentry for your project.
 It will create ${cyan("i18n-sentry.config.json")} in your project root
 and optionally install a pre-commit hook.
 Project root: ${dim(process.cwd())}
 `);
 }
- 
+
 async function stepFramework(): Promise<string> {
     const detected = detectFramework();
     if (detected) {
@@ -190,7 +190,7 @@ async function stepFramework(): Promise<string> {
     ]);
     return choice.value;
 }
- 
+
 async function stepLocaleDir(): Promise<string> {
     const detected = detectLocaleDir();
     if (detected) {
@@ -199,18 +199,18 @@ async function stepLocaleDir(): Promise<string> {
     }
     return await ask("\nPath to locale files directory", "./src/i18n/locales");
 }
- 
+
 async function stepScanDir(): Promise<string> {
     const detected = detectScanDir();
     console.log(`\n${green("✓")} Suggested scan directory: ${cyan(detected)}`);
     if (await askYesNo(`Scan ${cyan(detected)} for i18n usage?`)) return detected;
     return await ask("Path to scan directory", "./src");
 }
- 
+
 async function stepLocales(localeDir: string): Promise<string[]> {
     console.log(`\nWhich locales does your project use?`);
     console.log(dim("  Enter locale codes separated by commas (e.g. de,en,fr)"));
- 
+
     let detected: string[] = [];
     const path = resolve(process.cwd(), localeDir);
     if (existsSync(path)) {
@@ -227,17 +227,17 @@ async function stepLocales(localeDir: string): Promise<string[]> {
             detected = jsonFiles.length > 0 ? jsonFiles : dirs;
         } catch {}
     }
- 
+
     const defaultLocales = detected.length > 0 ? detected.join(",") : "de,en";
     if (detected.length > 0) console.log(`${green("✓")} Detected locales: ${cyan(detected.join(", "))}`);
- 
+
     const input = await ask("Locales", defaultLocales);
     return input
         .split(",")
         .map((l) => l.trim())
         .filter(Boolean);
 }
- 
+
 async function stepSourceLocale(locales: string[]): Promise<string> {
     console.log(`\nWhich is your ${bold("source")} locale? ${dim("(the reference language)")}`);
     locales.forEach((l, i) => console.log(`  ${cyan(String(i + 1) + ".")} ${l}`));
@@ -245,7 +245,7 @@ async function stepSourceLocale(locales: string[]): Promise<string> {
     const idx = parseInt(input) - 1;
     return locales[Math.max(0, Math.min(idx, locales.length - 1))];
 }
- 
+
 async function stepIgnoreKeys(): Promise<string[]> {
     console.log(`\nAre there any key patterns to ignore? ${dim("(e.g. notifications.ticket.*)")}`);
     const input = await ask("Ignore keys (comma-separated, leave empty to skip)", "");
@@ -255,7 +255,7 @@ async function stepIgnoreKeys(): Promise<string[]> {
         .map((k) => k.trim())
         .filter(Boolean);
 }
- 
+
 async function stepIgnoreText(): Promise<string[]> {
     console.log(`\nAny text values to ignore in template checks? ${dim("(e.g. brand names)")}`);
     const input = await ask("Ignore text (comma-separated, leave empty to skip)", "");
@@ -265,27 +265,116 @@ async function stepIgnoreText(): Promise<string[]> {
         .map((t) => t.trim())
         .filter(Boolean);
 }
- 
+
+// AST mode is currently Vue-only (extractScriptStrings() in extractors/vue.ts).
+// Returns early with empty config for every other framework, so this step is
+// a complete no-op (no prompts shown) outside Vue projects.
+async function stepScriptScan(
+    framework: string
+): Promise<{ scriptScanFunctions: Record<string, "all" | number[]>; scriptScanProperties: string[] }> {
+    const empty = { scriptScanFunctions: {}, scriptScanProperties: [] };
+    if (framework !== "vue") return empty;
+
+    console.log(`\n${bold("AST mode")} ${dim("(experimental — scans <script setup> for hardcoded strings)")}`);
+    console.log(
+        dim(
+            "  Looks for hardcoded text in object properties (e.g. { label: \"...\" })\n" +
+                '  and specific function calls (e.g. toast.success("...")) that the\n' +
+                "  template scanner can't see."
+        )
+    );
+
+    const enable = await askYesNo("Enable AST mode for script blocks?", true);
+    if (!enable) return empty;
+
+    const propsInput = await ask("Object property keys to scan (comma-separated)", "label,title,text,description");
+    const scriptScanProperties = propsInput
+        .split(",")
+        .map((p) => p.trim())
+        .filter(Boolean);
+
+    const scriptScanFunctions: Record<string, "all" | number[]> = {};
+
+    if (await askYesNo("Scan toast.success/.error/.warning/.info calls?", true)) {
+        for (const fn of ["toast.success", "toast.error", "toast.warning", "toast.info"]) {
+            scriptScanFunctions[fn] = "all";
+        }
+    }
+
+    if (await askYesNo("Scan Vue h() render function calls?", true)) {
+        // index 0 is the tag name (e.g. "p"), never the text.
+        // h() has two valid signatures: h(tag, children) and h(tag, props, children) -
+        // the text sits at index 1 in the first form, index 2 in the second, so we
+        // scan both. Index 1 alone would miss h('p', { class: '...' }, "text").
+        scriptScanFunctions["h"] = [1, 2];
+    }
+
+    console.log(
+        dim(
+            "\n  Add more function calls to scan (leave empty to finish).\n" +
+                "  Format: functionName:argIndices  (0-based, comma-separated) or functionName:all\n" +
+                '  Example: createTextColumn:2   or   myToast.info:all'
+        )
+    );
+
+    while (true) {
+        const input = await ask("Additional function", "");
+        if (!input) break;
+
+        const sepIdx = input.lastIndexOf(":");
+        if (sepIdx === -1) {
+            console.log(yellow('  ! Missing ":", expected e.g. "toast.info:all" — skipped'));
+            continue;
+        }
+
+        const name = input.slice(0, sepIdx).trim();
+        const spec = input.slice(sepIdx + 1).trim();
+        if (!name || !spec) {
+            console.log(yellow("  ! Invalid format — skipped"));
+            continue;
+        }
+
+        if (spec === "all") {
+            scriptScanFunctions[name] = "all";
+            continue;
+        }
+
+        const indices = spec
+            .split(",")
+            .map((s) => parseInt(s.trim(), 10))
+            .filter((n) => Number.isInteger(n) && n >= 0);
+
+        if (indices.length === 0) {
+            console.log(yellow('  ! No valid argument indices — skipped (use "all" or e.g. "0,2")'));
+            continue;
+        }
+
+        scriptScanFunctions[name] = indices;
+    }
+
+    return { scriptScanFunctions, scriptScanProperties };
+}
+
 async function stepInstallHook(): Promise<boolean> {
     return await askYesNo(`\nInstall pre-commit hook? ${dim("(warns about i18n issues, never blocks commits)")}`);
 }
- 
+
 async function stepAddScript(): Promise<boolean> {
     return await askYesNo(`\nAdd ${cyan("lint:i18n")} script to package.json?`);
 }
- 
+
 async function stepPackageJsonLocation(): Promise<Choice | null> {
     const rootPkg = existsSync(resolve(process.cwd(), "package.json"));
     const subDirs = ["src/ui", "src/app", "app", "frontend", "client"];
     const subPkgs = subDirs.filter((d) => existsSync(resolve(process.cwd(), d, "package.json")));
- 
+
     if (!rootPkg && subPkgs.length === 0) {
         console.log(yellow("! No package.json found — skipping script addition"));
         return null;
     }
- 
+
     const choices: Choice[] = [];
- 
+
     if (rootPkg) {
         choices.push({
             label: `Root  ${dim("./package.json")}`,
@@ -293,7 +382,7 @@ async function stepPackageJsonLocation(): Promise<Choice | null> {
             script: "i18n-sentry scan",
         });
     }
- 
+
     for (const d of subPkgs) {
         // npm puts every node_modules/.bin between here and the project root
         // on PATH for package.json scripts, so no manual `cd` is required.
@@ -303,7 +392,7 @@ async function stepPackageJsonLocation(): Promise<Choice | null> {
             script: "i18n-sentry scan",
         });
     }
- 
+
     if (choices.length === 1) {
         console.log(
             `\n${green("✓")} Found package.json at: ${cyan(choices[0].value === "." ? "root" : choices[0].value)}`
@@ -311,20 +400,20 @@ async function stepPackageJsonLocation(): Promise<Choice | null> {
         const confirm = await askYesNo(`Add lint:i18n script there?`);
         return confirm ? choices[0] : null;
     }
- 
+
     return await askChoice("Which package.json should get the lint:i18n script?", choices);
 }
- 
+
 // ── Writers ───────────────────────────────────────────────────────────────────
- 
+
 function writeConfig(cfg: object, basePath: string) {
     const configPath = resolve(basePath, "i18n-sentry.config.json");
- 
+
     writeFileSync(configPath, JSON.stringify(cfg, null, 2) + "\n", "utf8");
- 
+
     console.log(`\n${green("✓")} Created ${cyan(configPath)}`);
 }
- 
+
 function addPackageScript(location: Choice) {
     const pkgPath = resolve(process.cwd(), location.value, "package.json");
     if (!existsSync(pkgPath)) {
@@ -342,12 +431,12 @@ function addPackageScript(location: Choice) {
     );
     console.log(`  ${dim("Command: " + location.script)}`);
 }
- 
+
 // ── Main ──────────────────────────────────────────────────────────────────────
- 
+
 async function main() {
     await stepWelcome();
- 
+
     if (existsSync(resolve(process.cwd(), "i18n-sentry.config.json"))) {
         const overwrite = await askYesNo(`\n${yellow("!")} i18n-sentry.config.json already exists. Overwrite?`, false);
         if (!overwrite) {
@@ -356,7 +445,7 @@ async function main() {
             return;
         }
     }
- 
+
     const framework = await stepFramework();
     const localeDir = await stepLocaleDir();
     const scanDir = await stepScanDir();
@@ -364,6 +453,7 @@ async function main() {
     const sourceLocale = await stepSourceLocale(locales);
     const ignoreKeys = await stepIgnoreKeys();
     const ignoreText = await stepIgnoreText();
+    const { scriptScanFunctions, scriptScanProperties } = await stepScriptScan(framework);
     const installHook = await stepInstallHook();
     const addScript = await stepAddScript();
     const scriptLocation = addScript ? await stepPackageJsonLocation() : null;
@@ -379,6 +469,8 @@ async function main() {
             ignoreRawText: ignoreText,
             textAttributes: [],
             warnAttributes: [],
+            scriptScanFunctions,
+            scriptScanProperties,
         },
         basePath
     );
